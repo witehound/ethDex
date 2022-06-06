@@ -4,12 +4,15 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract BuyGina {
-    address public owner;
+    using SafeMath for uint256;
+    
+    address private owner;
     IERC20 public usst;
     IERC20 public gina;
-    address public usstAdd;
-    uint256 public balance = 0;
-    uint256 public price = 10 * 10**18;
+    uint256 private price = 1 ether;
+    uint256 private rate = 1;
+    uint256 private salesCount = 0;
+    mapping( address => uint256) public withdrawalBalance;
 
     constructor(address _usdt, address _gina) {
         owner = msg.sender;
@@ -17,13 +20,19 @@ contract BuyGina {
         gina = IERC20(_gina);
     }
 
-    function usdtToShib() public payable {
-        usst.transferFrom(msg.sender, address(this), price);
-        gina.transfer(msg.sender, (price / 10));
+    function buyGina(uint256 _amount) public payable {
+        require()
+        if( salesCount % 5 == 0){
+            rate -= 0.05
+        }
+        uint256 memory tempRate = price * _amount;
+        usst.transferFrom(msg.sender, address(this), tempRate);
+        salesCount++;
+        withdrawalBalance[msg.sender] += (tempRate * rate);
     }
 
-    function depositGina() public payable {
-        require(msg.sender == owner, "only owner can deposit gina");
-        gina.transferFrom(msg.sender, address(this), price);
+    function withdrawGina() public payable {
+        require(withdrawalBalance[msg.sender] > 0, "only owner can deposit gina");
+        gina.transferFrom(address(this), msg.sender, price);
     }
 }
